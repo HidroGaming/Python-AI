@@ -42,30 +42,25 @@ train_dataloader = DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle
 test_dataloader = DataLoader(dataset=test_data, batch_size=BATCH_SIZE, shuffle=False)
 
 class Model(nn.Module):
-    def __init__(self,
-                input_shape: int,
-                hidden_units:int,
-                output_shape: int):
-
+    def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
         super().__init__()
         self.layer_stack = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=input_shape, out_features=hidden_units),
-            nn.Linear(in_features=hidden_units,out_features=output_shape)
+            nn.LazyLinear(out_features=output_shape)
         )
-    def forward(self,x):
+    def forward(self, x):
         return self.layer_stack(x)
 
 model = Model(input_shape=784,hidden_units=2,output_shape=len(train_data.classes)).to(device)
 
 
-LEARNING_RATE = 0.05
+LEARNING_RATE = 0.1
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(params=model.parameters(),lr=LEARNING_RATE)
 
 train_time_start_on_cpu = timer()
-EPOCHS = 8
+EPOCHS = 3
 
 for epoch in tqdm(range(EPOCHS)):
     print(f"Epoch: {epoch}")
